@@ -1,0 +1,29 @@
+name: Deploy til GitHub
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Lar deg kjøre manuelt fra GitHub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Sjekk ut repository
+        uses: actions/checkout@v3
+
+      - name: 🛠 Installer Swift-verktøy
+        run: swift package update
+
+      - name: 🔍 Initialiser Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: 📤 Push endringer til GitHub
+        run: |
+          git add .
+          git commit -m "Automatisk deploy via GitHub Actions"
+          git push
