@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Lar deg kjøre manuelt fra GitHub
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -27,3 +27,6 @@ jobs:
           git add .
           git commit -m "Automatisk deploy via GitHub Actions"
           git push
+
+      - name: 🚀 Send Slack-varsel etter vellykket deploy
+        run: sh Scripts/slack_notify.sh
