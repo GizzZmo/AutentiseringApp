@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "🔧 Installerer avhengigheter..."
+echo "🔧 Installerer Swift-pakker..."
 swift package update
 echo "✅ Ferdig!"
