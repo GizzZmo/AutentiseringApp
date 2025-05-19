@@ -10,7 +10,7 @@ struct SharingSettingsView: View {
     @State private var participants: [CKShare.Participant] = []
     @State private var delingsHistorikk: [String] = []
     private let privatDatabase = CKContainer.default().privateCloudDatabase
-    
+
     var body: some View {
         VStack {
             TextField("Søk etter deltaker...", text: $søkeTekst)
@@ -53,7 +53,7 @@ struct SharingSettingsView: View {
                     UserDefaults.standard.set(pushVarslingerAktivert, forKey: "PushVarslingerAktivert")
                 }
                 .padding()
-            
+
             List(delingsHistorikk, id: \.self) { historikk in
                 Text(historikk)
             }
@@ -89,13 +89,13 @@ struct SharingSettingsView: View {
         innhold.title = "Delingsinnstillinger"
         innhold.body = melding
         innhold.sound = .default
-        
+
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         let forespørsel = UNNotificationRequest(identifier: "DelingVarsling", content: innhold, trigger: trigger)
-        
+
         UNUserNotificationCenter.current().add(forespørsel)
     }
-    
+
     private func lagreHistorikk(_ melding: String) {
         DispatchQueue.main.async {
             self.delingsHistorikk.append("\(Date()): \(melding)")
