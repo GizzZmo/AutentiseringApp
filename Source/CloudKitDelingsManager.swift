@@ -8,7 +8,16 @@ class CloudKitDelingsManager {
 
     func delPost(postID: CKRecord.ID, ferdig: @escaping (CKShare?) -> Void) {
         privatDatabase.fetch(withRecordID: postID) { post, feil in
+            if let feil = feil {
+                print("Feil ved henting av post: \(feil.localizedDescription)")
+                self.lagreNotifikasjonsLogg("Feil ved henting av post: \(feil.localizedDescription)")
+                ferdig(nil)
+                return
+            }
+            
             guard let post = post else {
+                print("Posten ble ikke funnet.")
+                self.lagreNotifikasjonsLogg("Posten ble ikke funnet.")
                 ferdig(nil)
                 return
             }
@@ -27,7 +36,10 @@ class CloudKitDelingsManager {
             }
 
             privatDatabase.save(deling) { lagretDeling, lagringsFeil in
-                if lagringsFeil == nil {
+                if let lagringsFeil = lagringsFeil {
+                    print("Feil ved lagring av deling: \(lagringsFeil.localizedDescription)")
+                    self.lagreNotifikasjonsLogg("Feil ved lagring av deling: \(lagringsFeil.localizedDescription)")
+                } else {
                     self.sendVarsling("Delingen er oppdatert!")
                     self.lagreNotifikasjonsLogg("Push-varsling sendt for oppdatert deling.")
                 }
