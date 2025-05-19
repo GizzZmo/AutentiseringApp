@@ -1,13 +1,22 @@
 import Foundation
 
-class UserSettingsManager {
-    static let shared = UserSettingsManager()
+class BrukerInnstillingerManager {
+    static let standard = BrukerInnstillingerManager()
+    
+    private let delingstillatelseNøkkel = "delingstillatelse"
 
-    func saveUserPreference(for userID: String, key: String, value: Any) {
-        UserDefaults.standard.set(value, forKey: "\(userID)_\(key)")
+    enum Delingstillatelse: String {
+        case kunLesing = "Kun lesing"
+        case lesOgSkriv = "Les og skriv"
+        case privat = "Privat"
     }
 
-    func getUserPreference(for userID: String, key: String) -> Any? {
-        return UserDefaults.standard.object(forKey: "\(userID)_\(key)")
+    func settDelingstillatelse(_ tillatelse: Delingstillatelse) {
+        UserDefaults.standard.set(tillatelse.rawValue, forKey: delingstillatelseNøkkel)
+    }
+
+    func hentDelingstillatelse() -> Delingstillatelse {
+        let verdi = UserDefaults.standard.string(forKey: delingstillatelseNøkkel) ?? Delingstillatelse.kunLesing.rawValue
+        return Delingstillatelse(rawValue: verdi) ?? .kunLesing
     }
 }
