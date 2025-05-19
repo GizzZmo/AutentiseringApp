@@ -27,4 +27,4 @@ USER swiftuser
 
 EXPOSE 8080
 
-CMD ["/app/build/MyApp"]
+CMD ["/app/build/AutentiseringApp"]
