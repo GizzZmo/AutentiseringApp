@@ -8,6 +8,7 @@ struct SharingSettingsView: View {
     @State private var pushVarslingerAktivert = UserDefaults.standard.bool(forKey: "PushVarslingerAktivert")
     @State private var søkeTekst: String = ""
     @State private var participants: [CKShare.Participant] = []
+    @State private var delingsHistorikk: [String] = []
     private let privatDatabase = CKContainer.default().privateCloudDatabase
     
     var body: some View {
@@ -31,10 +32,12 @@ struct SharingSettingsView: View {
                 .confirmationDialog("Endre tillatelser?", isPresented: $showConfirmation) {
                     Button("Kun lesing") {
                         selectedParticipant?.permission = .readOnly
+                        lagreHistorikk("Kun lesing satt for \(selectedParticipant?.userIdentity.name ?? "Ukjent")")
                         sendVarsling(melding: "Delingstillatelse oppdatert: Kun lesing")
                     }
                     Button("Kan redigere") {
                         selectedParticipant?.permission = .readWrite
+                        lagreHistorikk("Kan redigere satt for \(selectedParticipant?.userIdentity.name ?? "Ukjent")")
                         sendVarsling(melding: "Delingstillatelse oppdatert: Kan redigere")
                     }
                     Button("Avbryt", role: .cancel) {}
@@ -50,6 +53,11 @@ struct SharingSettingsView: View {
                     UserDefaults.standard.set(pushVarslingerAktivert, forKey: "PushVarslingerAktivert")
                 }
                 .padding()
+            
+            List(delingsHistorikk, id: \.self) { historikk in
+                Text(historikk)
+            }
+            .padding()
         }
         .onAppear {
             hentCloudKitData()
@@ -86,5 +94,11 @@ struct SharingSettingsView: View {
         let forespørsel = UNNotificationRequest(identifier: "DelingVarsling", content: innhold, trigger: trigger)
         
         UNUserNotificationCenter.current().add(forespørsel)
+    }
+    
+    private func lagreHistorikk(_ melding: String) {
+        DispatchQueue.main.async {
+            self.delingsHistorikk.append("\(Date()): \(melding)")
+        }
     }
 }
