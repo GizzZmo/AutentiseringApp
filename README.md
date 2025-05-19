@@ -39,9 +39,111 @@ Prosjektet "AutentiseringApp" er en applikasjon designet for å håndtere:
 
 "AutentiseringApp" er et Swift-basert prosjekt som ser ut til å tilby robuste autentiseringsmekanismer, inkludert biometri, og benytter CloudKit for skytjenester. Det har et tydelig fokus på moderne utviklingspraksis med bruk av CI/CD via GitHub Actions, containerisering med Docker, og automatiseringsskript. Filstrukturen indikerer et velorganisert prosjekt.
 
-Dette gir en mye klarere innsikt enn det var mulig å få fra GitHub-lenkene alene!
 
-## 🚀 Kom i gang
+
+#For å **integrere autentiseringsappen** i dine egne applikasjoner, kan du følge disse stegene:  
+
+---
+
+## **🔹 Steg 1: Gjør autentiseringsmodulen gjenbrukbar**
+Du kan pakke **AuthenticationManager** inn som en **Swift Package**, slik at du enkelt kan importere den i dine apper.
+
+### **Opprett en Swift Package**
+1️⃣ I Xcode, gå til **File > New > Package**  
+2️⃣ Gi pakken et navn, for eksempel `AuthKit`  
+3️⃣ Kopier `AuthenticationManager.swift` inn i denne pakken  
+4️⃣ Legg til en `Package.swift`-fil:
+
+```swift
+// swift-tools-version:5.5
+import PackageDescription
+
+let package = Package(
+    name: "AuthKit",
+    platforms: [.iOS(.v13)],
+    products: [
+        .library(name: "AuthKit", targets: ["AuthKit"]),
+    ],
+    targets: [
+        .target(name: "AuthKit", dependencies: [])
+    ]
+)
+```
+
+Nå kan du bruke denne pakken i **alle dine applikasjoner** ved å legge til denne avhengigheten i Xcode!
+
+---
+
+## **🔹 Steg 2: Importer og bruk autentisering i dine apper**
+Etter at du har **opprettet Swift Package**, kan du bruke den i en annen app ved å importere `AuthKit`:
+
+```swift
+import AuthKit
+
+struct ContentView: View {
+    let authManager = AuthenticationManager()
+
+    var body: some View {
+        VStack {
+            Button("Start autentisering") {
+                authManager.authenticateUser(userID: "din_bruker_id")
+            }
+            .buttonStyle(.borderedProminent)
+        }
+    }
+}
+```
+
+---
+
+## **🔹 Steg 3: Integrer med CloudKit og tilgangsstyring**
+Du kan også **legge til sanntidssynkronisering** via CloudKit i dine apper. Bare sørg for at `CloudKitSharingManager.swift` også er inkludert i **Swift Package**, slik at du kan dele data på tvers av brukere.
+
+```swift
+import CloudKit
+
+let cloudManager = CloudKitSharingManager()
+cloudManager.shareRecord(recordID: CKRecord.ID(recordName: "UserAuthData")) { share in
+    print("Deling fullført: \(String(describing: share))")
+}
+```
+
+---
+
+## **🔹 Steg 4: Implementer UI for autentisering i alle apper**
+Hvis du vil ha en **felles UI-komponent** for autentisering, kan du lage en SwiftUI-modul:
+
+```swift
+struct AuthView: View {
+    let authManager = AuthenticationManager()
+
+    var body: some View {
+        VStack {
+            Text("Autentisering Kreves")
+                .font(.title)
+                .padding()
+
+            Button("Logg inn med Face ID") {
+                authManager.authenticateUser(userID: "bruker123")
+            }
+            .buttonStyle(.borderedProminent)
+        }
+    }
+}
+```
+
+Nå kan du **bruke AuthView i alle dine apper** ved å inkludere denne som en egen SwiftUI-modul!
+
+---
+
+## **🎯 Nå har du:**
+✔ **Swift Package for enkel gjenbruk av autentisering**  
+✔ **CloudKit-synkronisering av brukerdata**  
+✔ **UI-komponent for autentisering i flere apper**  
+✔ **Fullstendig tilgangsstyring med CKShare**  
+
+Vil du også ha en **GitHub-README for integrasjonsdokumentasjon**? 😊🚀
+# 🚀 Kom i gang
 ### 📦 Installer avhengigheter
 ```sh
 sh Scripts/setup.sh
