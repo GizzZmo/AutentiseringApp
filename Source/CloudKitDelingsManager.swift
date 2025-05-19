@@ -4,6 +4,7 @@ import UserNotifications
 class CloudKitDelingsManager {
     private let privatDatabase = CKContainer.default().privateCloudDatabase
     private let brukerInnstillinger = BrukerInnstillingerManager.standard
+    private var notifikasjonsLogg: [String] = []
 
     func delPost(postID: CKRecord.ID, ferdig: @escaping (CKShare?) -> Void) {
         privatDatabase.fetch(withRecordID: postID) { post, feil in
@@ -28,7 +29,7 @@ class CloudKitDelingsManager {
             privatDatabase.save(deling) { lagretDeling, lagringsFeil in
                 if lagringsFeil == nil {
                     self.sendVarsling("Delingen er oppdatert!")
-                    self.oppdaterCloudKitData()
+                    self.lagreNotifikasjonsLogg("Push-varsling sendt for oppdatert deling.")
                 }
                 ferdig(lagretDeling)
             }
@@ -46,15 +47,10 @@ class CloudKitDelingsManager {
 
         UNUserNotificationCenter.current().add(forespørsel)
     }
-
-    private func oppdaterCloudKitData() {
-        let delingsSpørring = CKQuery(recordType: "SharingData", predicate: NSPredicate(value: true))
-        privatDatabase.perform(delingsSpørring, inZoneWith: nil) { result, feil in
-            if let feil = feil {
-                print("Feil ved oppdatering av CloudKit-data: \(feil.localizedDescription)")
-            } else {
-                print("CloudKit-data oppdatert.")
-            }
+    
+    private func lagreNotifikasjonsLogg(_ melding: String) {
+        DispatchQueue.main.async {
+            self.notifikasjonsLogg.append("\(Date()): \(melding)")
         }
     }
 }
