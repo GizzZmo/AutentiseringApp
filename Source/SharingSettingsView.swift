@@ -6,11 +6,17 @@ struct SharingSettingsView: View {
     @State private var selectedParticipant: CKShare.Participant?
     @State private var showConfirmation = false
     @State private var pushVarslingerAktivert = UserDefaults.standard.bool(forKey: "PushVarslingerAktivert")
-    var participants: [CKShare.Participant] = []
+    @State private var søkeTekst: String = ""
+    @State private var participants: [CKShare.Participant] = []
+    private let privatDatabase = CKContainer.default().privateCloudDatabase
     
     var body: some View {
         VStack {
-            List(participants, id: \.userIdentity) { participant in
+            TextField("Søk etter deltaker...", text: $søkeTekst)
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+            List(filteredParticipants(), id: \.userIdentity) { participant in
                 Button(action: {
                     selectedParticipant = participant
                     showConfirmation = true
@@ -44,6 +50,27 @@ struct SharingSettingsView: View {
                     UserDefaults.standard.set(pushVarslingerAktivert, forKey: "PushVarslingerAktivert")
                 }
                 .padding()
+        }
+        .onAppear {
+            hentCloudKitData()
+        }
+    }
+
+    private func filteredParticipants() -> [CKShare.Participant] {
+        if søkeTekst.isEmpty {
+            return participants
+        } else {
+            return participants.filter { $0.userIdentity.name?.localizedCaseInsensitiveContains(søkeTekst) ?? false }
+        }
+    }
+
+    private func hentCloudKitData() {
+        let delingsSpørring = CKQuery(recordType: "SharingData", predicate: NSPredicate(value: true))
+        privatDatabase.perform(delingsSpørring, inZoneWith: nil) { result, feil in
+            guard let result = result else { return }
+            DispatchQueue.main.async {
+                self.participants = result.compactMap { $0 as? CKShare.Participant }
+            }
         }
     }
 
