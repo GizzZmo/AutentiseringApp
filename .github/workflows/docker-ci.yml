@@ -65,8 +65,8 @@ jobs:
           cache-to: type=gha,mode=max
 
       # (Valgfritt) Send Slack-varsling ved feil
-      # - name: Slack Notification ved feil
-      #   if: failure()
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+       - name: Slack Notification ved feil
+         if: failure()
+         uses: rtCamp/action-slack-notify@v2
+         env:
+           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
