@@ -4,10 +4,10 @@ FROM swift:latest AS builder
 # Sett arbeidsmappe
 WORKDIR /app
 
-# Kopier kildekoden
-COPY . .
+# Kopier Package.swift og andre nødvendige filer
+COPY Package.swift Package.resolved Sources Tests ./
 
-# Installer avhengigheter og oppdater pakker
+# Installer avhengigheter
 RUN swift package update
 
 # Bygg applikasjonen
@@ -16,7 +16,6 @@ RUN swift build -c release
 # Opprett et nytt, lettvekts image for runtime
 FROM swift:latest AS runtime
 
-# Sett arbeidsmappe for runtime
 WORKDIR /app
 
 # Kopier kun det nødvendige fra builder-steg
@@ -26,8 +25,6 @@ COPY --from=builder /app/.build/release /app/build
 RUN useradd -m swiftuser
 USER swiftuser
 
-# Eksponer porten som applikasjonen kjører på
 EXPOSE 8080
 
-# Start applikasjonen
 CMD ["/app/build/MyApp"]
