@@ -1,32 +1,29 @@
-name: Deploy til GitHub
+name: Deploy AutentiseringApp
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 🚀 Sjekk ut repository
+      - name: 🛠 Sjekk ut repository
         uses: actions/checkout@v3
 
-      - name: 🛠 Installer Swift-verktøy
-        run: swift package update
+      - name: 🔑 Konfigurer GitHub-token
+        run: echo "machine github.com login ${{ secrets.GITHUB_USERNAME }} password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
 
-      - name: 🔍 Initialiser Git
+      - name: 🏗 Installer Swift og oppdater pakker
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          sudo apt-get update
+          sudo apt-get install -y swift
+          swift package update
 
-      - name: 📤 Push endringer til GitHub
+      - name: 🛠 Bygg og start Docker-container
         run: |
-          git add .
-          git commit -m "Automatisk deploy via GitHub Actions"
-          git push
+          docker-compose up -d --build
 
-      - name: 🚀 Send Slack-varsel etter vellykket deploy
-        run: sh Scripts/slack_notify.sh
+      - name: ✅ Sjekk applikasjonens status
+        run: curl --fail http://localhost:8080 || exit 1
