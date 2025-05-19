@@ -1,11 +1,16 @@
-version: '3.8'
+version: "3.8"
 services:
-  app:
+  web:
+    image: autentisering-app:latest
     build: .
-    container_name: autentisering_app
-    volumes:
-      - .:/app
-    ports:
-      - "8080:8080"
+    restart: always
     environment:
-      - ENVIRONMENT=production
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - API_KEY=${API_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
