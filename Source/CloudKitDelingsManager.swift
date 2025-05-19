@@ -8,6 +8,7 @@ class CloudKitDelingsManager {
     func delPost(postID: CKRecord.ID, ferdig: @escaping (CKShare?) -> Void) {
         privatDatabase.fetch(withRecordID: postID) { post, feil in
             guard let post = post else {
+                print("Feil: Kunne ikke hente posten.")
                 ferdig(nil)
                 return
             }
@@ -28,6 +29,8 @@ class CloudKitDelingsManager {
             privatDatabase.save(deling) { lagretDeling, lagringsFeil in
                 if let feil = lagringsFeil {
                     print("Feil ved lagring av CKShare: \(feil.localizedDescription)")
+                } else {
+                    print("Deling lagret: \(lagretDeling?.recordID.recordName ?? "Ukjent")")
                 }
                 ferdig(lagretDeling)
             }
