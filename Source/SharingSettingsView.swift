@@ -1,5 +1,6 @@
 import SwiftUI
 import CloudKit
+import Combine
 import UserNotifications
 
 struct SharingSettingsView: View {
@@ -7,15 +8,21 @@ struct SharingSettingsView: View {
     @State private var showConfirmation = false
     @State private var pushVarslingerAktivert = UserDefaults.standard.bool(forKey: "PushVarslingerAktivert")
     @State private var søkeTekst: String = ""
+    @State private var debouncedSøkeTekst: String = ""
     @State private var participants: [CKShare.Participant] = []
     @State private var delingsHistorikk: [String] = []
     private let privatDatabase = CKContainer.default().privateCloudDatabase
+    private var søkDebounce = PassthroughSubject<String, Never>()
+    private var cancellables = Set<AnyCancellable>()
 
     var body: some View {
         VStack {
             TextField("Søk etter deltaker...", text: $søkeTekst)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                .onChange(of: søkeTekst) { nyTekst in
+                    søkDebounce.send(nyTekst)
+                }
 
             List(filteredParticipants(), id: \.userIdentity) { participant in
                 Button(action: {
@@ -60,15 +67,26 @@ struct SharingSettingsView: View {
             .padding()
         }
         .onAppear {
+            setupDebounce()
             hentCloudKitData()
         }
     }
 
+    private func setupDebounce() {
+        søkDebounce
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { debouncedValue in
+                self.debouncedSøkeTekst = debouncedValue
+                self.hentCloudKitData()
+            }
+            .store(in: &cancellables)
+    }
+
     private func filteredParticipants() -> [CKShare.Participant] {
-        if søkeTekst.isEmpty {
+        if debouncedSøkeTekst.isEmpty {
             return participants
         } else {
-            return participants.filter { $0.userIdentity.name?.localizedCaseInsensitiveContains(søkeTekst) ?? false }
+            return participants.filter { $0.userIdentity.name?.localizedCaseInsensitiveContains(debouncedSøkeTekst) ?? false }
         }
     }
 
@@ -84,7 +102,7 @@ struct SharingSettingsView: View {
 
     private func sendVarsling(melding: String) {
         guard pushVarslingerAktivert else { return }
-        
+
         let innhold = UNMutableNotificationContent()
         innhold.title = "Delingsinnstillinger"
         innhold.body = melding
