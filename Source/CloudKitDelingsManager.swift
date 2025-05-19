@@ -1,14 +1,13 @@
 import CloudKit
+import UserNotifications
 
 class CloudKitDelingsManager {
-    private let container = CKContainer.default()
     private let privatDatabase = CKContainer.default().privateCloudDatabase
     private let brukerInnstillinger = BrukerInnstillingerManager.standard
 
     func delPost(postID: CKRecord.ID, ferdig: @escaping (CKShare?) -> Void) {
         privatDatabase.fetch(withRecordID: postID) { post, feil in
             guard let post = post else {
-                print("Feil: Kunne ikke hente posten.")
                 ferdig(nil)
                 return
             }
@@ -27,13 +26,23 @@ class CloudKitDelingsManager {
             }
 
             privatDatabase.save(deling) { lagretDeling, lagringsFeil in
-                if let feil = lagringsFeil {
-                    print("Feil ved lagring av CKShare: \(feil.localizedDescription)")
-                } else {
-                    print("Deling lagret: \(lagretDeling?.recordID.recordName ?? "Ukjent")")
+                if lagringsFeil == nil {
+                    self.sendVarsling("Delingen er oppdatert!")
                 }
                 ferdig(lagretDeling)
             }
         }
+    }
+
+    private func sendVarsling(_ melding: String) {
+        let innhold = UNMutableNotificationContent()
+        innhold.title = "AutentiseringApp"
+        innhold.body = melding
+        innhold.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+        let forespørsel = UNNotificationRequest(identifier: "delingVarsling", content: innhold, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(forespørsel)
     }
 }
