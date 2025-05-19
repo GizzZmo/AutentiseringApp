@@ -48,7 +48,7 @@ Prosjektet "AutentiseringApp" er en applikasjon designet for å håndtere:
 
 
 
-#For å **integrere autentiseringsappen** i dine egne applikasjoner, kan du følge disse stegene:  
+## For å **integrere autentiseringsappen** i dine egne applikasjoner, kan du følge disse stegene:  
 
 ---
 
