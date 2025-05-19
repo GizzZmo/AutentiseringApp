@@ -1,0 +1,15 @@
+{
+  "cornerRadius": 8,
+  "borderWidth": 2,
+  "borderColor": "#3498db",
+  "backgroundColor": "#1abc9c",
+  "textColor": "#ffffff",
+  "fontSize": 18,
+  "padding": 12,
+  "shadow": {
+    "offsetX": 2,
+    "offsetY": 2,
+    "blurRadius": 4,
+    "color": "#000000"
+  }
+}
