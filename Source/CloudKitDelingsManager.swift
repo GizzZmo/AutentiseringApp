@@ -28,6 +28,7 @@ class CloudKitDelingsManager {
             privatDatabase.save(deling) { lagretDeling, lagringsFeil in
                 if lagringsFeil == nil {
                     self.sendVarsling("Delingen er oppdatert!")
+                    self.oppdaterCloudKitData()
                 }
                 ferdig(lagretDeling)
             }
@@ -44,5 +45,16 @@ class CloudKitDelingsManager {
         let forespørsel = UNNotificationRequest(identifier: "delingVarsling", content: innhold, trigger: trigger)
 
         UNUserNotificationCenter.current().add(forespørsel)
+    }
+
+    private func oppdaterCloudKitData() {
+        let delingsSpørring = CKQuery(recordType: "SharingData", predicate: NSPredicate(value: true))
+        privatDatabase.perform(delingsSpørring, inZoneWith: nil) { result, feil in
+            if let feil = feil {
+                print("Feil ved oppdatering av CloudKit-data: \(feil.localizedDescription)")
+            } else {
+                print("CloudKit-data oppdatert.")
+            }
+        }
     }
 }
