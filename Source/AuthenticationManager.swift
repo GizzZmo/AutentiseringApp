@@ -1,20 +1,27 @@
 import UIKit
 import LocalAuthentication
+import Security
 
-class AutentiseringsManager {
-    private let tilbakemeldingsGenerator = UIImpactFeedbackGenerator(style: .medium)
+class AuthenticationManager {
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+    private let maxFeilForsøk = 3
+    private var feilForsøk = UserDefaults.standard.integer(forKey: "FeilForsøk")
 
-    func autentiserBruker(brukerID: String, ferdig: @escaping (Bool, String?) -> Void) {
+    func autentiserBruker(brukerID: String, passord: String?, ferdig: @escaping (Bool, String?) -> Void) {
+        guard feilForsøk < maxFeilForsøk else {
+            ferdig(false, "Kontoen er låst etter flere mislykkede forsøk.")
+            return
+        }
+
         let kontekst = LAContext()
-        var feil: NSError?
         let grunn = "Bekreft identiteten din for å få tilgang."
-        kontekst.localizedFallbackTitle = "Bruk passkode"
+        kontekst.localizedFallbackTitle = "Bruk passord"
 
         visAktivitetsindikator()
-        tilbakemeldingsGenerator.impactOccurred() // Haptisk tilbakemelding
+        feedbackGenerator.impactOccurred()
 
-        // Sjekk om biometrisk autentisering er tilgjengelig
-        if kontekst.canEvaluatePolicy(.deviceOwnerAuthentication, error: &feil) {
+        // Biometrisk autentisering først
+        if kontekst.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil) {
             kontekst.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: grunn) { suksess, evalFeil in
                 DispatchQueue.main.async {
                     self.skjulAktivitetsindikator()
@@ -22,34 +29,75 @@ class AutentiseringsManager {
                         self.lagreAutentiseringsstatus(for: brukerID, erAutentisert: true)
                         ferdig(true, nil)
                     } else {
-                        let feilMelding = self.håndterAutentiseringsfeil(evalFeil)
-                        ferdig(false, feilMelding)
+                        self.håndterFallbackAutentisering(brukerID: brukerID, passord: passord, ferdig: ferdig)
                     }
                 }
             }
         } else {
-            ferdig(false, "Biometrisk autentisering er ikke tilgjengelig. Vennligst bruk passkode.")
+            håndterFallbackAutentisering(brukerID: brukerID, passord: passord, ferdig: ferdig)
         }
     }
 
-    private func håndterAutentiseringsfeil(_ feil: Error?) -> String {
-        guard let feil = feil as? LAError else { return "Ukjent autentiseringsfeil." }
+    private func håndterFallbackAutentisering(brukerID: String, passord: String?, ferdig: @escaping (Bool, String?) -> Void) {
+        guard let lagretPassord = hentPassordFraKeychain(for: brukerID) else {
+            ferdig(false, "Ingen lagret passord funnet.")
+            return
+        }
 
-        switch feil.code {
-        case .authenticationFailed:
-            return "Autentisering mislyktes. Vennligst prøv igjen."
-        case .userCancel:
-            return "Autentisering avbrutt av bruker."
-        case .biometryNotAvailable:
-            return "Biometrisk autentisering er ikke tilgjengelig på denne enheten."
-        case .biometryNotEnrolled:
-            return "Ingen biometriske data er registrert. Vennligst sett opp Face ID eller Touch ID."
-        default:
-            return "En uventet feil oppstod."
+        if passord == lagretPassord {
+            feilForsøk = 0
+            UserDefaults.standard.set(feilForsøk, forKey: "FeilForsøk")
+            ferdig(true, nil)
+        } else {
+            feilForsøk += 1
+            UserDefaults.standard.set(feilForsøk, forKey: "FeilForsøk")
+
+            if feilForsøk >= maxFeilForsøk {
+                ferdig(false, "Kontoen er låst. Tilbakestill passord for tilgang.")
+            } else {
+                ferdig(false, "Feil passord. Forsøk igjen.")
+            }
         }
     }
 
     private func lagreAutentiseringsstatus(for brukerID: String, erAutentisert: Bool) {
-        UserDefaults.standard.set(erAutentisert, forKey: "erAutentisert_\(brukerID)")
+        let statusData = "\(erAutentisert)".data(using: .utf8)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: brukerID,
+            kSecValueData as String: statusData!
+        ]
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    func tilbakestillPassord(brukerID: String, nyttPassord: String) {
+        lagrePassordTilKeychain(for: brukerID, passord: nyttPassord)
+        feilForsøk = 0
+        UserDefaults.standard.set(feilForsøk, forKey: "FeilForsøk")
+    }
+
+    private func lagrePassordTilKeychain(for brukerID: String, passord: String) {
+        let data = passord.data(using: .utf8)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: brukerID,
+            kSecValueData as String: data!
+        ]
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    private func hentPassordFraKeychain(for brukerID: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: brukerID,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var dataTypeRef: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
+        if status == errSecSuccess, let data = dataTypeRef as? Data {
+            return String(data: data, encoding: .utf8)
+        }
+        return nil
     }
 }
