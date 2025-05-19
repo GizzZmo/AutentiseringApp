@@ -9,6 +9,13 @@ En moderne iOS-app med **biometrisk autentisering, sanntidssynkronisering, og br
 ✅ **Administrasjon av delingstillatelser med UI-komponenter**  
 ✅ **Slack-varsler etter deploy for team-kommunikasjon**
 
+## **🛠 Installering**
+### 📦 **Legg til Swift Package i ditt Xcode-prosjekt**
+1️⃣ **Åpne Xcode**  
+2️⃣ **Gå til** `File > Swift Packages > Add Package Dependency`  
+3️⃣ **Skriv inn repo-URLen**:
+
+
 Her er en oppsummering av hva prosjektet ser ut til å handle om og hvilke teknologier som brukes:
 
 **Hovedformål og Funksjonalitet:**
