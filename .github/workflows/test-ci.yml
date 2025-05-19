@@ -1,0 +1,38 @@
+name: CI/CD Testing for AutentiseringApp
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - name: 🚀 Sjekk ut repository
+        uses: actions/checkout@v3
+
+      - name: 🛠 Sett opp Swift-miljø
+        run: |
+          sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+          swift --version
+
+      - name: 📦 Installer avhengigheter
+        run: swift package update
+
+      - name: ✅ Kjør enhetstester for autentisering
+        run: swift test --filter AuthenticationManagerTests
+
+      - name: ✅ Test CloudKit-synkronisering
+        run: swift test --filter CloudKitTests
+
+      - name: ✅ Test Docker-container
+        run: docker build -t autentisering-app .
+
+      - name: 📤 Send Slack-varsler ved feil
+        if: failure()
+        run: sh Scripts/slack_notify.sh
