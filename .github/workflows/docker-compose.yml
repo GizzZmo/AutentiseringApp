@@ -1,0 +1,17 @@
+#!/bin/bash
+echo "🐳 Bygger Docker-container..."
+docker build -t autentisering-app .
+
+echo "🚀 Starter container..."
+docker run -p 8080:8080 autentisering-app
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: autentisering_app
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    environment:
+      - ENVIRONMENT=production
