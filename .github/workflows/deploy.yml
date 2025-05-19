@@ -9,21 +9,51 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1. Check out the repository
       - name: 🛠 Sjekk ut repository
         uses: actions/checkout@v3
 
+      # 2. Cache Swift dependencies for faster builds
+      - name: 💾 Cache Swift Packages
+        uses: actions/cache@v3
+        with:
+          path: .build
+          key: ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-
+
+      # 3. Set up authentication more securely
+      # If you need DockerHub or GitHub authentication, use official actions.
+      # If .netrc is required, consider masking secrets in logs.
       - name: 🔑 Konfigurer GitHub-token
         run: echo "machine github.com login ${{ secrets.GITHUB_USERNAME }} password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
+        shell: bash
 
+      # 4. Install Swift and update packages
       - name: 🏗 Installer Swift og oppdater pakker
         run: |
           sudo apt-get update
           sudo apt-get install -y swift
           swift package update
 
+      # 5. Build and start Docker container
       - name: 🛠 Bygg og start Docker-container
         run: |
           docker-compose up -d --build
 
+      # 6. Check application status with improved error handling
       - name: ✅ Sjekk applikasjonens status
-        run: curl --fail http://localhost:8080 || exit 1
+        run: |
+          if ! curl --fail http://localhost:8080; then
+            echo "❌ Application deployment failed"
+            docker-compose logs
+            exit 1
+          fi
+
+      # 7. Optional: Clean up unused Docker resources (uncomment if needed)
+      - name: 🧹 Clean up Docker resources
+        run: docker system prune -f
+
+      # 8. Optional: Add notifications (Slack, email, etc.) here
+      - name: 📣 Notify team
+        uses: some/notification-action@v1
