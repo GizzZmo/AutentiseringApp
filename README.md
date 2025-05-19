@@ -14,12 +14,13 @@ En moderne iOS-app med **biometrisk autentisering, sanntidssynkronisering, og br
 ```sh
 sh Scripts/setup.sh
 
+# ![A showcase of the modernized T-Ford from multiple angles, highlighting its racing parts, wide body kit, skirt, wing, and modern technology  The image should be realistic and detailed](https://github.com/user-attachments/assets/b4bcd79b-7fd7-402a-99e9-4dfb849f906b)
 //**  
 
-##Her er en oppsummering av hva prosjektet ser ut til å handle om og hvilke teknologier som brukes:
+## Her er en oppsummering av hva prosjektet ser ut til å handle om og hvilke teknologier som brukes:
 
-**Hovedformål og Funksjonalitet:**
-
+### **Hovedformål og Funksjonalitet:**
+                                    
 Prosjektet "AutentiseringApp" ser ut til å være en applikasjon designet for å håndtere:
 
 * **Autentisering:** Spesielt biometrisk autentisering (som Face ID eller Touch ID), antydet av `AuthenticationManager.swift` og `face_id_animation.json`.
