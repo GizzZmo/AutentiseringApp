@@ -1,26 +1,40 @@
 version: "3.8"
 services:
   web:
-    image: autentisering-app:latest
-    build: .
+    image: autentisering-app:v1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     environment:
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - API_KEY=${API_KEY}
+    secrets:
+      - db_password
+      - api_key
     deploy:
       resources:
         limits:
-          memory: "512M"
-          cpus: "0.5"
+          memory: "${MEMORY_LIMIT:-512M}"
+          cpus: "${CPU_LIMIT:-0.5}"
     logging:
-      driver: "json-file"
+      driver: "fluentd"
       options:
-        max-size: "10m"
-        max-file: "3"
+        fluentd-address: "localhost:24224"
+        tag: "docker.web"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - app_network
+
+networks:
+  app_network:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  api_key:
+    file: ./secrets/api_key.txt
