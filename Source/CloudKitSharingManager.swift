@@ -3,6 +3,7 @@ import CloudKit
 class CloudKitDelingsManager {
     private let container = CKContainer.default()
     private let privatDatabase = CKContainer.default().privateCloudDatabase
+    private let brukerInnstillinger = BrukerInnstillingerManager.standard
 
     func delPost(postID: CKRecord.ID, ferdig: @escaping (CKShare?) -> Void) {
         privatDatabase.fetch(withRecordID: postID) { post, feil in
@@ -10,18 +11,20 @@ class CloudKitDelingsManager {
                 ferdig(nil)
                 return
             }
-            
-            let deling = CKShare(rootRecord: post)
-            deling.publicPermission = .readWrite
 
-            // Sjekk tilgang for deltaker
-            guard let deltaker = deling.currentUserParticipant else {
-                ferdig(nil)
-                return
+            let deling = CKShare(rootRecord: post)
+            let valgtTillatelse = self.brukerInnstillinger.hentDelingstillatelse()
+
+            // Sett tilgang basert på brukerens preferanse
+            switch valgtTillatelse {
+            case .kunLesing:
+                deling.publicPermission = .readOnly
+            case .lesOgSkriv:
+                deling.publicPermission = .readWrite
+            case .privat:
+                deling.publicPermission = .none
             }
-            
-            deltaker.permission = .readOnly
-            
+
             privatDatabase.save(deling) { lagretDeling, lagringsFeil in
                 if let feil = lagringsFeil {
                     print("Feil ved lagring av CKShare: \(feil.localizedDescription)")
