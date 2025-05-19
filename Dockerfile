@@ -1,17 +1,33 @@
-# Bruk en offisiell Swift-image
-FROM swift:latest
+# Bruk offisiell Swift base image
+FROM swift:latest AS builder
 
-# Sett arbeidsdirektivet
+# Sett arbeidsmappe
 WORKDIR /app
 
-# Kopier kildekoden inn i containeren
+# Kopier kildekoden
 COPY . .
 
-# Installer avhengigheter
+# Installer avhengigheter og oppdater pakker
 RUN swift package update
 
 # Bygg applikasjonen
-RUN swift build
+RUN swift build -c release
 
-# Kjør applikasjonen
-CMD ["swift", "run", "main.swift"]
+# Opprett et nytt, lettvekts image for runtime
+FROM swift:latest AS runtime
+
+# Sett arbeidsmappe for runtime
+WORKDIR /app
+
+# Kopier kun det nødvendige fra builder-steg
+COPY --from=builder /app/.build/release /app/build
+
+# Ikke kjør som root for bedre sikkerhet
+RUN useradd -m swiftuser
+USER swiftuser
+
+# Eksponer porten som applikasjonen kjører på
+EXPOSE 8080
+
+# Start applikasjonen
+CMD ["/app/build/MyApp"]
