@@ -6,54 +6,104 @@ on:
       - main
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
-      # 1. Check out the repository
-      - name: 🛠 Sjekk ut repository
+      - name: Check out repository
         uses: actions/checkout@v3
-
-      # 2. Cache Swift dependencies for faster builds
-      - name: 💾 Cache Swift Packages
+      - name: Set up SSH key for Git operations
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.GITKEY }}
+      - name: Set Git config for GPG
+        run: |
+          git config --global user.name "Jon Arve Ovesen"
+          git config --global user.email "jonovesen@gmail.com"
+          git config --global commit.gpgsign true
+          git config --global user.signingkey <GPG_KEY_ID>
+      - name: Cache Swift Packages
         uses: actions/cache@v3
         with:
           path: .build
           key: ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
+            ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
             ${{ runner.os }}-swift-
-
-      # 3. Set up authentication more securely
-      # If you need DockerHub or GitHub authentication, use official actions.
-      # If .netrc is required, consider masking secrets in logs.
-      - name: 🔑 Konfigurer GitHub-token
-        run: echo "machine github.com login ${{ secrets.GITHUB_USERNAME }} password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
-        shell: bash
-
-      # 4. Install Swift and update packages
-      - name: 🏗 Installer Swift og oppdater pakker
+            ${{ runner.os }}-
+      - name: Install Swift and update packages
         run: |
-          sudo apt-get update
-          sudo apt-get install -y swift
+          sudo apt-get update || exit 1
+          sudo apt-get install -y swift || exit 1
           swift package update
+      - name: Run Unit Tests
+        run: swift test
 
-      # 5. Build and start Docker container
-      - name: 🛠 Bygg og start Docker-container
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up SSH key for Git operations
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.GITKEY }}
+      - name: Set Git config for GPG
         run: |
-          docker-compose up -d --build
-
-      # 6. Check application status with improved error handling
-      - name: ✅ Sjekk applikasjonens status
+          git config --global user.name "Jon Arve Ovesen"
+          git config --global user.email "jonovesen@gmail.com"
+          git config --global commit.gpgsign true
+          git config --global user.signingkey <GPG_KEY_ID>
+      - name: Cache Swift Packages
+        uses: actions/cache@v3
+        with:
+          path: .build
+          key: ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
+            ${{ runner.os }}-swift-
+            ${{ runner.os }}-
+      - name: Install Swift and update packages
         run: |
-          if ! curl --fail http://localhost:8080; then
-            echo "❌ Application deployment failed"
-            docker-compose logs
-            exit 1
-          fi
+          sudo apt-get update || exit 1
+          sudo apt-get install -y swift || exit 1
+          swift package update
+      # Optional: Uncomment the following step to clean up Docker resources when needed
+      # - name: Clean up Docker resources
+      #   run: docker system prune -f
+      - name: Stop and Remove Existing Containers
+        run: docker-compose down || true
+      - name: Build and start Docker container
+        run: docker-compose up -d --build --pull
+      - name: Check application status
+        run: |
+          for i in {1..5}; do
+            if curl --fail http://localhost:8080; then
+              echo "✅ Application is running"
+              exit 0
+            fi
+            echo "Waiting for application to start..."
+            sleep 10
+          done
+          echo "❌ Application deployment failed"
+          docker-compose logs
+          exit 1
+      - name: Notify on Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_USERNAME: AutentiseringAppBot
+          SLACK_COLOR: '#FF0000'
+          SLACK_MESSAGE: |
+            🚨 Deployment failed for `${{ github.ref }}` by `${{ github.actor }}`
 
-      # 7. Optional: Clean up unused Docker resources (uncomment if needed)
-      - name: 🧹 Clean up Docker resources
-        run: docker system prune -f
-
-      # 8. Optional: Add notifications (Slack, email, etc.) here
-      - name: 📣 Notify team
-        uses: some/notification-action@v1
+      # Optional: Uncomment the following step to notify team on success
+      # - name: Notify team on success
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_USERNAME: AutentiseringAppBot
+      #     SLACK_COLOR: '#36a64f'
+      #     SLACK_MESSAGE: |
+      #       ✅ Deployment successful for `${{ github.ref }}` by `${{ github.actor }}`
