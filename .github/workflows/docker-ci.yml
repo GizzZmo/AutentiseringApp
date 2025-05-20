@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
 
       # Linter Dockerfile for best practices
-      - name: 🕵️ Lint Dockerfile
+      - name: 🕵️‍♂️ Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
@@ -47,7 +47,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Kjør tester i Docker-containeren
+      # Kjører tester i Docker-containeren
       - name: ✅ Kjør applikasjonstester
         run: docker run --rm autentisering-app:${{ github.sha }} swift test
 
@@ -64,9 +64,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # (Valgfritt) Send Slack-varsling ved feil
-       - name: Slack Notification ved feil
-         if: failure()
-         uses: rtCamp/action-slack-notify@v2
-         env:
-           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      # (Valgfritt) Send Slack-varsling ved feil - rettet indentasjon
+      - name: Slack Notification ved feil
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
