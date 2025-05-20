@@ -20,7 +20,7 @@ jobs:
           git config --global user.name "Jon Arve Ovesen"
           git config --global user.email "jonovesen@gmail.com"
           git config --global commit.gpgsign true
-          git config --global user.signingkey <GPG_KEY_ID>
+          git config --global user.signingkey <025B8CE027DBA6E7>
       - name: Cache Swift Packages
         uses: actions/cache@v3
         with:
