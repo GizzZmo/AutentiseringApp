@@ -9,6 +9,18 @@ if [[ -z "$DB_HOST" || -z "$DB_USER" || -z "$DB_PASSWORD" || -z "$API_KEY" ]]; t
     exit 1
 fi
 
+# Sjekk at Docker er installert
+if ! command -v docker &>/dev/null; then
+    echo "Feil: Docker er ikke installert!" | tee -a $LOG_FILE
+    exit 1
+fi
+
+# Sjekk at git remote 'origin' er satt
+if ! git remote | grep -q origin; then
+    echo "Feil: git remote 'origin' er ikke satt." | tee -a $LOG_FILE
+    exit 1
+fi
+
 echo "Starter deployment..." | tee -a $LOG_FILE
 
 # Deploy-applikasjonen
@@ -33,4 +45,10 @@ echo "📤 Skyver til GitHub..."
 git push -u origin main
 
 echo "✅ Deploy ferdig! Sender Slack-varsel..."
-sh Scripts/slack_notify.sh
+
+# Ekstra sjekk og feilhåndtering for eksternt script
+if [[ -x Scripts/slack_notify.sh ]]; then
+    sh Scripts/slack_notify.sh
+else
+    echo "Advarsel: Scripts/slack_notify.sh finnes ikke eller er ikke kjørbar, Slack-varsling hoppet over." | tee -a $LOG_FILE
+fi
