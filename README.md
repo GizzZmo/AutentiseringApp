@@ -9,9 +9,12 @@ En moderne iOS-app med **biometrisk autentisering, sanntidssynkronisering, og br
 
 ## 📚 Dokumentasjon
 
-- **[ABOUT.md](ABOUT.md)** - Komplett prosjektoversikt, arkitektur og teknisk informasjon
-- **[HOWTO.md](HOWTO.md)** - Detaljert brukerveiledning og implementasjonsguide
-- **[LICENSE](LICENSE)** - BSD 3-Clause lisensinformasjon
+- **[📑 DOCS.md](DOCS.md)** - Komplett dokumentasjonsindeks og navigasjonsguide
+- **[📖 ABOUT.md](ABOUT.md)** - Detaljert prosjektoversikt, arkitektur og teknisk informasjon
+- **[💡 HOWTO.md](HOWTO.md)** - Steg-for-steg brukerveiledning og implementasjonsguide  
+- **[🔌 API.md](API.md)** - Komplett API-referansedokumentasjon
+- **[🤝 CONTRIBUTING.md](CONTRIBUTING.md)** - Retningslinjer for bidrag til prosjektet
+- **[📄 LICENSE](LICENSE)** - BSD 3-Clause lisensinformasjon
 
 ## 🔥 Funksjoner
 
