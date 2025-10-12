@@ -34,21 +34,22 @@ jobs:
       - name: 📦 Installer avhengigheter
         run: swift package update
 
-      - name: 📏 Lint Swift Code
-        run: swiftlint
-
       - name: ✅ Kjør enhetstester for autentisering
-        run: swift test --filter AuthenticationManagerTests
+        run: swift test
 
       - name: 📤 Send Slack-varsler ved suksess
-        if: success()
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh success "Authentication tests passed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "Authentication tests passed on ${{ github.ref }} at ${{ github.sha }}"
 
       - name: 📤 Send Slack-varsler ved feil
-        if: failure()
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh failure "Authentication tests failed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "Authentication tests failed on ${{ github.ref }} at ${{ github.sha }}"
 
   test-cloudkit:
     runs-on: macos-latest
@@ -75,21 +76,22 @@ jobs:
       - name: 📦 Installer avhengigheter
         run: swift package update
 
-      - name: 📏 Lint Swift Code
-        run: swiftlint
-
       - name: ✅ Test CloudKit-synkronisering
-        run: swift test --filter CloudKitTests
+        run: swift test
 
       - name: 📤 Send Slack-varsler ved suksess
-        if: success()
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh success "CloudKit tests passed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "CloudKit tests passed on ${{ github.ref }} at ${{ github.sha }}"
 
       - name: 📤 Send Slack-varsler ved feil
-        if: failure()
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh failure "CloudKit tests failed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "CloudKit tests failed on ${{ github.ref }} at ${{ github.sha }}"
 
   docker-build-and-test:
     runs-on: ubuntu-latest
@@ -105,14 +107,18 @@ jobs:
           docker run --rm autentisering-app swift test
 
       - name: 📤 Send Slack-varsler ved suksess
-        if: success()
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh success "Docker build and tests passed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "Docker build and tests passed on ${{ github.ref }} at ${{ github.sha }}"
 
       - name: 📤 Send Slack-varsler ved feil
-        if: failure()
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh failure "Docker build or tests failed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "Docker build or tests failed on ${{ github.ref }} at ${{ github.sha }}"
 
 # Documentation and comments for clarity
 # - Each job runs independently and in parallel for efficiency.

@@ -5,7 +5,9 @@ FROM swift:latest AS builder
 WORKDIR /app
 
 # Kopier Package.swift og andre nødvendige filer
-COPY Package.swift Package.resolved Sources Tests ./
+COPY Package.swift ./
+COPY Sources ./Sources
+COPY Tests ./Tests
 
 # Installer avhengigheter
 RUN swift package update

@@ -15,12 +15,10 @@ jobs:
         uses: webfactory/ssh-agent@v0.8.1
         with:
           ssh-private-key: ${{ secrets.GITKEY }}
-      - name: Set Git config for GPG
+      - name: Set Git config
         run: |
           git config --global user.name "Jon Arve Ovesen"
           git config --global user.email "jonovesen@gmail.com"
-          git config --global commit.gpgsign true
-          git config --global user.signingkey <025B8CE027DBA6E7>
       - name: Cache Swift Packages
         uses: actions/cache@v3
         with:
@@ -30,11 +28,12 @@ jobs:
             ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
             ${{ runner.os }}-swift-
             ${{ runner.os }}-
-      - name: Install Swift and update packages
-        run: |
-          sudo apt-get update || exit 1
-          sudo apt-get install -y swift || exit 1
-          swift package update
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.7"
+      - name: Update Swift packages
+        run: swift package update
       - name: Run Unit Tests
         run: swift test
 
@@ -48,12 +47,10 @@ jobs:
         uses: webfactory/ssh-agent@v0.8.1
         with:
           ssh-private-key: ${{ secrets.GITKEY }}
-      - name: Set Git config for GPG
+      - name: Set Git config
         run: |
           git config --global user.name "Jon Arve Ovesen"
           git config --global user.email "jonovesen@gmail.com"
-          git config --global commit.gpgsign true
-          git config --global user.signingkey <GPG_KEY_ID>
       - name: Cache Swift Packages
         uses: actions/cache@v3
         with:
@@ -63,11 +60,12 @@ jobs:
             ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
             ${{ runner.os }}-swift-
             ${{ runner.os }}-
-      - name: Install Swift and update packages
-        run: |
-          sudo apt-get update || exit 1
-          sudo apt-get install -y swift || exit 1
-          swift package update
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: "5.7"
+      - name: Update Swift packages
+        run: swift package update
       # Optional: Uncomment the following step to clean up Docker resources when needed
       # - name: Clean up Docker resources
       #   run: docker system prune -f
