@@ -33,10 +33,8 @@ Prosjektet "AutentiseringApp" er en applikasjon designet for å håndtere:
 * **Brukergrensesnitt:** SwiftUI brukes for minst deler av brukergrensesnittet (`SharingSettingsView.swift`).
 * **Backend og Databehandling:** Apple CloudKit brukes for skytjenester som datalagring, deling og sanntidsoppdateringer.
 * **Automatisering og CI/CD:**
-    * **Scripts (`📁 Scripts`):** Inneholder shell-scripts for å installere avhengigheter (`setup.sh`), automatisere GitHub-deployeringer (`deploy.sh`), sende Slack-varsler (`slack_notify.sh`), og bygge Docker-containere (`docker_build.sh`).
-    * **GitHub Actions (`📁 .github/workflows`):** Brukes for kontinuerlig integrasjon og leveranse (CI/CD) med filer for automatisk deployering (`deploy.yml`) og Docker-bygg/testing (`docker-ci.yml`).
-* **Containerisering (`📁 Docker`):**
-    * Prosjektet benytter Docker for å lage og administrere containere, med en `Dockerfile` for å bygge et image og en `docker-compose.yml` for å automatisere oppsett av flere containere.
+    * **Scripts (`📁 Scripts`):** Inneholder shell-scripts for å installere avhengigheter (`setup.sh`) og sende Slack-varsler (`slack_notify.sh`).
+    * **GitHub Actions (`📁 .github/workflows`):** Brukes for kontinuerlig integrasjon og leveranse (CI/CD) med testing på macOS (`test-ci.yml`).
 * **Ressurser (`📁 Assets`):** Inkluderer grafiske elementer som Lottie-animasjoner (for eksempel `face_id_animation.json` for autentisering) og ikoner.
 * **Dokumentasjon:**
     * `README.md`: Gir en generell beskrivelse av prosjektet.
@@ -44,7 +42,7 @@ Prosjektet "AutentiseringApp" er en applikasjon designet for å håndtere:
 
 **Oppsummert:**
 
-"AutentiseringApp" er et Swift-basert prosjekt som ser ut til å tilby robuste autentiseringsmekanismer, inkludert biometri, og benytter CloudKit for skytjenester. Det har et tydelig fokus på moderne utviklingspraksis med bruk av CI/CD via GitHub Actions, containerisering med Docker, og automatiseringsskript. Filstrukturen indikerer et velorganisert prosjekt.
+"AutentiseringApp" er et Swift-basert prosjekt som tilbyr robuste autentiseringsmekanismer, inkludert biometri, og benytter CloudKit for skytjenester. Det har et tydelig fokus på moderne utviklingspraksis med bruk av CI/CD via GitHub Actions og automatiseringsskript. Filstrukturen indikerer et velorganisert prosjekt.
 
 
 
