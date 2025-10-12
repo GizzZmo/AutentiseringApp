@@ -108,13 +108,23 @@ class AuthenticationManager {
     }
     
     // Stub methods for activity indicator - can be implemented with UI-specific code
+    /**
+     Shows an activity indicator to inform the user that an authentication process is in progress.
+     
+     - Note: This is a stub method intended to be implemented with platform-specific UI code (e.g., UIKit, SwiftUI, AppKit).
+     Implement this method in the context of your app's UI to provide appropriate feedback to the user.
+     */
     private func visAktivitetsindikator() {
-        // Placeholder for showing activity indicator
-        // Can be implemented with platform-specific UI code
+        // No-op: implement with platform-specific UI code if needed.
     }
     
+    /**
+     Hides the activity indicator that was shown during the authentication process.
+     
+     - Note: This is a stub method intended to be implemented with platform-specific UI code (e.g., UIKit, SwiftUI, AppKit).
+     Implement this method in the context of your app's UI to remove feedback when the process is complete.
+     */
     private func skjulAktivitetsindikator() {
-        // Placeholder for hiding activity indicator
-        // Can be implemented with platform-specific UI code
+        // No-op: implement with platform-specific UI code if needed.
     }
 }
