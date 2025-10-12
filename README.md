@@ -1,71 +1,193 @@
 # AutentiseringApp 🚀
-En moderne iOS-app med **biometrisk autentisering, sanntidssynkronisering, og brukerspesifikke innstillinger** basert på akademiske paradigmer.
+
+[![Swift Version](https://img.shields.io/badge/Swift-5.7+-orange.svg)](https://swift.org)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2015%2B%20%7C%20macOS%2010.15%2B-blue.svg)](https://developer.apple.com)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-green.svg)](LICENSE)
+[![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg)](https://github.com/features/actions)
+
+En moderne iOS-app med **biometrisk autentisering, sanntidssynkronisering, og brukerspesifikke innstillinger** basert på akademiske paradigmer og beste praksis for sikkerhet.
+
+## 📚 Dokumentasjon
+
+- **[📑 DOCS.md](DOCS.md)** - Komplett dokumentasjonsindeks og navigasjonsguide
+- **[📖 ABOUT.md](ABOUT.md)** - Detaljert prosjektoversikt, arkitektur og teknisk informasjon
+- **[💡 HOWTO.md](HOWTO.md)** - Steg-for-steg brukerveiledning og implementasjonsguide  
+- **[🔌 API.md](API.md)** - Komplett API-referansedokumentasjon
+- **[🤝 CONTRIBUTING.md](CONTRIBUTING.md)** - Retningslinjer for bidrag til prosjektet
+- **[📄 LICENSE](LICENSE)** - BSD 3-Clause lisensinformasjon
 
 ## 🔥 Funksjoner
-✅ **Biometrisk autentisering med haptisk tilbakemelding**  
-✅ **Spring-animasjoner og pulserende indikatorer**  
-✅ **CloudKit-synkronisering og sanntidsoppdateringer**  
-✅ **Deling av data mellom brukere med CKShare**  
-✅ **Administrasjon av delingstillatelser med UI-komponenter**  
-✅ **Slack-varsler etter deploy for team-kommunikasjon**
 
-## **🛠 Installering**
-### 📦 **Legg til Swift Package i ditt Xcode-prosjekt**
-1️⃣ **Åpne Xcode**  
-2️⃣ **Gå til** `File > Swift Packages > Add Package Dependency`  
-3️⃣ **Skriv inn repo-URLen**:
+✅ **Biometrisk autentisering** - Face ID/Touch ID med haptisk tilbakemelding  
+✅ **Sikker datalagring** - iOS Keychain for sensitiv informasjon  
+✅ **Spring-animasjoner** - Moderne UI med Lottie-animasjoner  
+✅ **CloudKit-synkronisering** - Sanntidsoppdateringer på tvers av enheter  
+✅ **Datadeling** - CKShare for sikker deling mellom brukere  
+✅ **Tilgangsstyring** - Fin-grained tillatelseskontroll  
+✅ **SwiftUI-komponenter** - Moderne, responsiv brukergrensesnitt  
+✅ **CI/CD** - Automatisert testing og deployment med GitHub Actions
 
+## 📋 Innholdsfortegnelse
 
-Her er en oppsummering av hva prosjektet ser ut til å handle om og hvilke teknologier som brukes:
+- [Installering](#-installering)
+- [Hurtigstart](#-hurtigstart)
+- [Grunnleggende Bruk](#-grunnleggende-bruk)
+- [Integrasjon i Egne Prosjekter](#-integrasjon-i-egne-prosjekter)
+- [Avanserte Funksjoner](#-avanserte-funksjoner)
+- [Testing](#-testing)
+- [Bidra](#-bidra)
+- [Lisens](#-lisens)
 
-**Hovedformål og Funksjonalitet:**
+## 🛠 Installering
 
-Prosjektet "AutentiseringApp" er en applikasjon designet for å håndtere:
+### Forutsetninger
 
-* **Autentisering:** Spesielt biometrisk autentisering (som Face ID eller Touch ID), antydet av `AuthenticationManager.swift` og `face_id_animation.json`.
-* **Datadeling og Synkronisering via CloudKit:** Appen bruker CloudKit for å dele data (`CloudKitSharingManager.swift` med `CKShare`) og for å motta sanntidsoppdateringer (`CloudKitSubscriptionManager.swift`).
-* **Brukerinnstillinger:** Den lagrer og henter brukerspesifikke innstillinger (`UserSettingsManager.swift`).
-* **Administrasjon av Tilgang:** Det finnes en UI-komponent bygget med SwiftUI (`SharingSettingsView.swift`) for å administrere deling og tilgang.
+- macOS 10.15+ (for utvikling)
+- Xcode 13.0+
+- Swift 5.7+
+- iOS 15.0+ (for deployment)
+- iCloud-konto (for CloudKit-funksjoner)
 
-**Kjernekomponenter og Teknologier:**
+### Metode 1: Swift Package Manager (Anbefalt)
 
-* **Programmeringsspråk:** Swift er hovedspråket, med `index.swift` og `main.swift` som sannsynlige inngangspunkter for applikasjonen.
-* **Brukergrensesnitt:** SwiftUI brukes for minst deler av brukergrensesnittet (`SharingSettingsView.swift`).
-* **Backend og Databehandling:** Apple CloudKit brukes for skytjenester som datalagring, deling og sanntidsoppdateringer.
-* **Automatisering og CI/CD:**
-    * **Scripts (`📁 Scripts`):** Inneholder shell-scripts for å installere avhengigheter (`setup.sh`) og sende Slack-varsler (`slack_notify.sh`).
-    * **GitHub Actions (`📁 .github/workflows`):** Brukes for kontinuerlig integrasjon og leveranse (CI/CD) med testing på macOS (`test-ci.yml`).
-* **Ressurser (`📁 Assets`):** Inkluderer grafiske elementer som Lottie-animasjoner (for eksempel `face_id_animation.json` for autentisering) og ikoner.
-* **Dokumentasjon:**
-    * `README.md`: Gir en generell beskrivelse av prosjektet.
-    * `HOWTO.md`: Tilbyr en trinnvis brukerveiledning.
+1️⃣ **Åpne ditt Xcode-prosjekt**
 
-**Oppsummert:**
+2️⃣ **Legg til package dependency**
+   - Gå til `File > Add Packages...`
+   - Lim inn repository URL: `https://github.com/GizzZmo/AutentiseringApp.git`
+   - Velg versjon eller branch
 
-"AutentiseringApp" er et Swift-basert prosjekt som tilbyr robuste autentiseringsmekanismer, inkludert biometri, og benytter CloudKit for skytjenester. Det har et tydelig fokus på moderne utviklingspraksis med bruk av CI/CD via GitHub Actions og automatiseringsskript. Filstrukturen indikerer et velorganisert prosjekt.
+3️⃣ **Importer i din kode**
+```swift
+import AutentiseringApp
+```
 
+### Metode 2: Manuell Kloning
 
+```bash
+# Klon repositoryet
+git clone https://github.com/GizzZmo/AutentiseringApp.git
+cd AutentiseringApp
 
-## For å **integrere autentiseringsappen** i dine egne applikasjoner, kan du følge disse stegene:  
+# Installer avhengigheter
+sh Scripts/setup.sh
 
----
+# Åpne i Xcode
+open Package.swift
+```
 
-## **🔹 Steg 1: Gjør autentiseringsmodulen gjenbrukbar**
+## 🚀 Hurtigstart
+
+### 1. Grunnleggende Autentisering
+
+```swift
+import AutentiseringApp
+
+let authManager = AuthenticationManager()
+
+// Autentiser med biometri eller passord
+authManager.autentiserBruker(brukerID: "bruker123", passord: nil) { suksess, feilmelding in
+    if suksess {
+        print("✅ Autentisering vellykket!")
+    } else {
+        print("❌ Autentisering feilet: \(feilmelding ?? "Ukjent feil")")
+    }
+}
+```
+
+### 2. CloudKit Datadeling
+
+```swift
+import CloudKit
+import AutentiseringApp
+
+let delingsManager = CloudKitDelingsManager()
+let postID = CKRecord.ID(recordName: "minPost")
+
+delingsManager.delPost(postID: postID) { share in
+    if let share = share {
+        print("✅ Data delt: \(share)")
+    }
+}
+```
+
+### 3. Brukerinnstillinger
+
+```swift
+import AutentiseringApp
+
+let innstillinger = BrukerInnstillingerManager.standard
+
+// Sett delingstillatelse
+innstillinger.settDelingstillatelse(.kunLesing)
+
+// Hent gjeldende tillatelse
+let tillatelse = innstillinger.hentDelingstillatelse()
+print("Gjeldende tillatelse: \(tillatelse)")
+```
+
+## 💡 Grunnleggende Bruk
+
+### Autentisering med Passord-Reset
+
+```swift
+let authManager = AuthenticationManager()
+
+// Hvis bruker glemmer passord
+authManager.tilbakestillPassord(
+    brukerID: "bruker123", 
+    nyttPassord: "sikkertPassord123"
+)
+```
+
+### SwiftUI-Integrasjon
+
+```swift
+import SwiftUI
+import AutentiseringApp
+
+struct ContentView: View {
+    @State private var erAutentisert = false
+    let authManager = AuthenticationManager()
+    
+    var body: some View {
+        VStack {
+            if erAutentisert {
+                Text("Velkommen!")
+                    .font(.largeTitle)
+            } else {
+                Button("Logg inn med Face ID") {
+                    authManager.autentiserBruker(brukerID: "bruker123", passord: nil) { suksess, _ in
+                        erAutentisert = suksess
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+}
+```
+
+## 🔌 Integrasjon i Egne Prosjekter
+
+### Steg 1: Gjør Autentiseringsmodulen Gjenbrukbar
+
 Du kan pakke **AuthenticationManager** inn som en **Swift Package**, slik at du enkelt kan importere den i dine apper.
 
-### **Opprett en Swift Package**
+#### Opprett en Swift Package
+
 1️⃣ I Xcode, gå til **File > New > Package**  
 2️⃣ Gi pakken et navn, for eksempel `AuthKit`  
 3️⃣ Kopier `AuthenticationManager.swift` inn i denne pakken  
 4️⃣ Legg til en `Package.swift`-fil:
 
 ```swift
-// swift-tools-version:5.5
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "AuthKit",
-    platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v15)],
     products: [
         .library(name: "AuthKit", targets: ["AuthKit"]),
     ],
@@ -75,23 +197,22 @@ let package = Package(
 )
 ```
 
-Nå kan du bruke denne pakken i **alle dine applikasjoner** ved å legge til denne avhengigheten i Xcode!
+### Steg 2: Importer og Bruk Autentisering
 
----
-
-## **🔹 Steg 2: Importer og bruk autentisering i dine apper**
-Etter at du har **opprettet Swift Package**, kan du bruke den i en annen app ved å importere `AuthKit`:
+Etter at du har **opprettet Swift Package**, kan du bruke den i en annen app:
 
 ```swift
 import AuthKit
 
-struct ContentView: View {
+struct LoginView: View {
     let authManager = AuthenticationManager()
 
     var body: some View {
         VStack {
             Button("Start autentisering") {
-                authManager.authenticateUser(userID: "din_bruker_id")
+                authManager.autentiserBruker(brukerID: "din_bruker_id", passord: nil) { suksess, feil in
+                    // Håndter resultat
+                }
             }
             .buttonStyle(.borderedProminent)
         }
@@ -99,57 +220,156 @@ struct ContentView: View {
 }
 ```
 
----
+### Steg 3: Integrer med CloudKit og Tilgangsstyring
 
-## **🔹 Steg 3: Integrer med CloudKit og tilgangsstyring**
-Du kan også **legge til sanntidssynkronisering** via CloudKit i dine apper. Bare sørg for at `CloudKitSharingManager.swift` også er inkludert i **Swift Package**, slik at du kan dele data på tvers av brukere.
+Legg til **sanntidssynkronisering** via CloudKit i dine apper:
 
 ```swift
 import CloudKit
+import AutentiseringApp
 
-let cloudManager = CloudKitSharingManager()
-cloudManager.shareRecord(recordID: CKRecord.ID(recordName: "UserAuthData")) { share in
+let cloudManager = CloudKitDelingsManager()
+cloudManager.delPost(postID: CKRecord.ID(recordName: "UserAuthData")) { share in
     print("Deling fullført: \(String(describing: share))")
 }
 ```
 
----
+### Steg 4: Implementer UI for Autentisering
 
-## **🔹 Steg 4: Implementer UI for autentisering i alle apper**
-Hvis du vil ha en **felles UI-komponent** for autentisering, kan du lage en SwiftUI-modul:
+Opprett en **felles UI-komponent** for autentisering:
 
 ```swift
+import SwiftUI
+import AutentiseringApp
+
 struct AuthView: View {
     let authManager = AuthenticationManager()
+    @State private var visStatus = false
 
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             Text("Autentisering Kreves")
                 .font(.title)
                 .padding()
 
             Button("Logg inn med Face ID") {
-                authManager.authenticateUser(userID: "bruker123")
+                authManager.autentiserBruker(brukerID: "bruker123", passord: nil) { suksess, _ in
+                    visStatus = true
+                }
             }
             .buttonStyle(.borderedProminent)
+            
+            if visStatus {
+                Text("✅ Innlogget")
+                    .foregroundColor(.green)
+            }
         }
+        .padding()
     }
 }
 ```
 
-Nå kan du **bruke AuthView i alle dine apper** ved å inkludere denne som en egen SwiftUI-modul!
+## 🎯 Avanserte Funksjoner
+
+### CloudKit Subscriptions
+
+For sanntidsoppdateringer:
+
+```swift
+import AutentiseringApp
+
+let subscriptionManager = CloudKitSubscriptionManager()
+// Konfigurer abonnementer for push-varsler
+```
+
+### Delingstillatelser
+
+```swift
+import AutentiseringApp
+
+// Tre tilgangsnivåer:
+let innstillinger = BrukerInnstillingerManager.standard
+
+// Kun lesing
+innstillinger.settDelingstillatelse(.kunLesing)
+
+// Les og skriv
+innstillinger.settDelingstillatelse(.lesOgSkriv)
+
+// Privat (ingen deling)
+innstillinger.settDelingstillatelse(.privat)
+```
+
+## 🧪 Testing
+
+### Kjør Tester
+
+```bash
+# Kjør alle tester
+swift test
+
+# Kjør tester med verbose output
+swift test --verbose
+
+# Kjør spesifikk test
+swift test --filter AutentiseringAppTests
+```
+
+### Eksempel Test
+
+```swift
+import XCTest
+@testable import AutentiseringApp
+
+final class AuthTests: XCTestCase {
+    func testBrukerInnstillinger() {
+        let manager = BrukerInnstillingerManager.standard
+        manager.settDelingstillatelse(.kunLesing)
+        XCTAssertEqual(manager.hentDelingstillatelse(), .kunLesing)
+    }
+}
+```
+
+## 🤝 Bidra
+
+Vi setter pris på bidrag! Her er hvordan du kan hjelpe:
+
+1. **Fork** repositoryet
+2. **Opprett** en feature branch (`git checkout -b feature/MinNyeFunksjon`)
+3. **Commit** endringene dine (`git commit -am 'Legg til ny funksjon'`)
+4. **Push** til branchen (`git push origin feature/MinNyeFunksjon`)
+5. **Opprett** en Pull Request
+
+### Retningslinjer
+
+- Følg eksisterende kodestil
+- Skriv tester for ny funksjonalitet
+- Oppdater dokumentasjon ved behov
+- Sørg for at alle tester kjører før du sender PR
+
+## 📄 Lisens
+
+Dette prosjektet er lisensiert under BSD 3-Clause License - se [LICENSE](LICENSE) for detaljer.
+
+Copyright (c) 2025, Jon Arve Ovesen
+
+## 🎯 Hva Har Du Nå?
+
+✔ **Swift Package** for enkel gjenbruk av autentisering  
+✔ **CloudKit-synkronisering** av brukerdata  
+✔ **UI-komponenter** for autentisering i flere apper  
+✔ **Fullstendig tilgangsstyring** med CKShare  
+✔ **Moderne SwiftUI-grensesnitt**  
+✔ **Robust sikkerhet** med Keychain og biometri
+
+## 📞 Support og Spørsmål
+
+- **Dokumentasjon**: Se [ABOUT.md](ABOUT.md) for detaljert prosjektinformasjon
+- **Brukerveiledning**: Se [HOWTO.md](HOWTO.md) for implementasjonsguide
+- **Issues**: Rapporter feil eller foreslå funksjoner via GitHub Issues
+- **Diskusjoner**: Delta i GitHub Discussions for spørsmål og ideer
 
 ---
 
-## **🎯 Nå har du:**
-✔ **Swift Package for enkel gjenbruk av autentisering**  
-✔ **CloudKit-synkronisering av brukerdata**  
-✔ **UI-komponent for autentisering i flere apper**  
-✔ **Fullstendig tilgangsstyring med CKShare**  
-
-Vil du også ha en **GitHub-README for integrasjonsdokumentasjon**? 😊🚀
-# 🚀 Kom i gang
-### 📦 Installer avhengigheter
-```sh
-sh Scripts/setup.sh
+**Laget med ❤️ for iOS-utviklere**
 
