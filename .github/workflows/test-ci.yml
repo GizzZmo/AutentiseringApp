@@ -9,11 +9,8 @@ on:
       - main
 
 jobs:
-  test-authentication:
+  test:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        swift: ["5.7", "5.8"]
     steps:
       - name: 🚀 Sjekk ut repository
         uses: actions/checkout@v3
@@ -26,15 +23,15 @@ jobs:
       - name: 📦 Cache Swift Dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.swiftpm
-          key: ${{ runner.os }}-swiftpm-${{ hashFiles('**/Package.resolved') }}
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-swiftpm-
+            ${{ runner.os }}-spm-
 
       - name: 📦 Installer avhengigheter
-        run: swift package update
+        run: swift package resolve
 
-      - name: ✅ Kjør enhetstester for autentisering
+      - name: ✅ Kjør enhetstester
         run: swift test
 
       - name: 📤 Send Slack-varsler ved suksess
@@ -42,88 +39,15 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh "Authentication tests passed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "Tests passed on ${{ github.ref }} at ${{ github.sha }}"
 
       - name: 📤 Send Slack-varsler ved feil
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          sh Scripts/slack_notify.sh "Authentication tests failed on ${{ github.ref }} at ${{ github.sha }}"
-
-  test-cloudkit:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        swift: ["5.7", "5.8"]
-    steps:
-      - name: 🚀 Sjekk ut repository
-        uses: actions/checkout@v3
-
-      - name: 🛠 Sett opp Swift-miljø
-        run: |
-          sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
-          swift --version
-
-      - name: 📦 Cache Swift Dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.swiftpm
-          key: ${{ runner.os }}-swiftpm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-swiftpm-
-
-      - name: 📦 Installer avhengigheter
-        run: swift package update
-
-      - name: ✅ Test CloudKit-synkronisering
-        run: swift test
-
-      - name: 📤 Send Slack-varsler ved suksess
-        if: success() && env.SLACK_WEBHOOK_URL != ''
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          sh Scripts/slack_notify.sh "CloudKit tests passed on ${{ github.ref }} at ${{ github.sha }}"
-
-      - name: 📤 Send Slack-varsler ved feil
-        if: failure() && env.SLACK_WEBHOOK_URL != ''
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          sh Scripts/slack_notify.sh "CloudKit tests failed on ${{ github.ref }} at ${{ github.sha }}"
-
-  docker-build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🚀 Sjekk ut repository
-        uses: actions/checkout@v3
-
-      - name: ✅ Bygg Docker-container
-        run: docker build -t autentisering-app .
-
-      - name: ✅ Kjør tester i Docker-container
-        run: |
-          docker run --rm autentisering-app swift test
-
-      - name: 📤 Send Slack-varsler ved suksess
-        if: success() && env.SLACK_WEBHOOK_URL != ''
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          sh Scripts/slack_notify.sh "Docker build and tests passed on ${{ github.ref }} at ${{ github.sha }}"
-
-      - name: 📤 Send Slack-varsler ved feil
-        if: failure() && env.SLACK_WEBHOOK_URL != ''
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          sh Scripts/slack_notify.sh "Docker build or tests failed on ${{ github.ref }} at ${{ github.sha }}"
+          sh Scripts/slack_notify.sh "Tests failed on ${{ github.ref }} at ${{ github.sha }}"
 
 # Documentation and comments for clarity
-# - Each job runs independently and in parallel for efficiency.
 # - Swift dependency caching is enabled for faster builds.
-# - Slack notifications are sent on both success and failure, with branch and commit info.
-# - Linting step enforces code style.
-# - Docker job builds and tests the container.
-# - Matrix testing covers multiple Swift versions.
+# - Slack notifications are sent on both success and failure (when webhook is configured).
