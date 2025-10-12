@@ -1,9 +1,13 @@
+#if canImport(UIKit)
 import UIKit
+#endif
 import LocalAuthentication
 import Security
 
 class AuthenticationManager {
+#if canImport(UIKit)
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+#endif
     private let maxFeilForsøk = 3
     private var feilForsøk = UserDefaults.standard.integer(forKey: "FeilForsøk")
 
@@ -18,7 +22,9 @@ class AuthenticationManager {
         kontekst.localizedFallbackTitle = "Bruk passord"
 
         visAktivitetsindikator()
+#if canImport(UIKit)
         feedbackGenerator.impactOccurred()
+#endif
 
         // Biometrisk autentisering først
         if kontekst.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil) {
@@ -99,5 +105,16 @@ class AuthenticationManager {
             return String(data: data, encoding: .utf8)
         }
         return nil
+    }
+    
+    // Stub methods for activity indicator - can be implemented with UI-specific code
+    private func visAktivitetsindikator() {
+        // Placeholder for showing activity indicator
+        // Can be implemented with platform-specific UI code
+    }
+    
+    private func skjulAktivitetsindikator() {
+        // Placeholder for hiding activity indicator
+        // Can be implemented with platform-specific UI code
     }
 }
