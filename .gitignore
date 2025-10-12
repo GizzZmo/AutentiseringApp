@@ -1,0 +1,30 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+deploy.log
+
+# Secrets
+secrets/
+*.key
+*.pem
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
